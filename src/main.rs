@@ -13,13 +13,14 @@ fn main() {
         Ok(devices) => devices,
         Err(e) => {
             println!("Error getting devices from the muxer: {:?}", e);
-
+            pause();
             return;
         }
     };
     println!("Found {} devices", devices.len());
     if devices.len() == 0 {
         println!("No devices found");
+        pause();
         return;
     }
     println!("Selecting first device...");
@@ -34,6 +35,7 @@ fn main() {
             if e == InstProxyError::UnknownError {
                 println!("This can be due to bad pairing files. Delete {}.plist from your OS's respective folder and re-pair your device.", device.udid);
             }
+            pause();
             return;
         }
     };
@@ -56,6 +58,7 @@ fn main() {
         }
         Err(e) => {
             println!("Error looking up apps: {:?}", e);
+            pause();
             return;
         }
     };
@@ -83,9 +86,18 @@ fn main() {
         Err(e) => {
             println!("Error starting debug server: {:?}", e);
             println!("This can be caused by not having the DMG mounted. You can do that either through AltServer or running `ideviceimagemounter`.");
+            pause();
             return;
         }
     };
 
     println!("All tests completede succesfully!");
+    pause();
+}
+
+fn pause() {
+    let mut stdout = std::io::stdout();
+    std::io::Write::write(&mut stdout, b"Press Enter to continue...").unwrap();
+    std::io::Write::flush(&mut stdout).unwrap();
+    std::io::Read::read(&mut std::io::stdin(), &mut [0]).unwrap();
 }
